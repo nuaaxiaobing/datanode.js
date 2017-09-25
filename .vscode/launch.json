@@ -1,0 +1,27 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "StartUp",
+            "type": "node",
+            "request": "launch",
+            "program": "{workspaceRoot}/www/startup.js",
+            "stopOnEntry": false,
+            "args": [
+                
+            ],
+            "cwd": "${workspaceRoot}/www",
+            "preLaunchTask": null,
+            "runtimeExecutable": null,
+            "runtimeArgs": [
+                "--nolazy",
+                "--use_strict"
+            ],
+            "env": {
+                "NODE_ENV": "development"
+            },
+            "console": "internalConsole",
+            "sourceMaps": false
+        }
+    ]
+}
