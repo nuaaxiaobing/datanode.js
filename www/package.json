@@ -20,12 +20,17 @@
         "url": "https://github.com/nuaaxiaobing/datanode.js"
     },
     "dependencies": {
+        "lodash": "4.17.4",
         "koa": "2.3.0",
+        "koa-router": "7.2.1",
         "koa-bodyparser": "4.2.0",
         "co-body": "5.1.1",
         "sqlite": "2.8.0",
         "sequelize": "4.10.3",
-        "winston": "2.3.1"
+        "uuid": "3.1.0",
+        "winston": "2.3.1",
+        "jjv": "1.0.2",
+        "os": "0.1.1"
     },
     "devDependencies": {
         
