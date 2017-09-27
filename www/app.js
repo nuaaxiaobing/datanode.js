@@ -22,7 +22,7 @@ app.use(async (ctx, next) => {
         execTime;
     try {
         await next();
-    } catch(e) {
+    } catch (e) {
         logger.error('error process request', e);
     }
     logger.info(`Response: ${ctx.response.status}`);
