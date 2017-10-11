@@ -1,5 +1,10 @@
 'user strict'
 
+/**
+ * 根据koa的中间件原则
+ * 启动加载所有中间件
+ * author pc ref. Liao  2017/9/23
+ */
 const 
     isProduction = (process.env.NODE_ENV === 'production'),
     HOSTNAME = require('os').hostname(),
@@ -52,14 +57,16 @@ let filters = {
 };
 
 
-app.use(templating('views',{
-    noCache: !isProduction,
-    watch: !isProduction,
-    filters: filters
-}));
+// app.use(templating('views',{
+//     noCache: !isProduction,
+//     watch: !isProduction,
+//     filters: filters
+// }));
 
+//加载restfun中间件
 app.use(restify());
 
+//加载koa router中间件
 app.use(controller());
 
 module.exports = app;

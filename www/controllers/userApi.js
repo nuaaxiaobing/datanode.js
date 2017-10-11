@@ -25,5 +25,9 @@ async function _getUser(username) {
 module.exports = {
     'GET /api/user/:name' : async function(ctx, next) {
         ctx.rest(await _getUser(ctx.params.name));
+    },
+    
+    'GET /api/users' : async function(ctx, next) {
+        ctx.rest(await _getUsers());
     }
 }

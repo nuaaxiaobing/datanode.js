@@ -1,13 +1,16 @@
 /**
- * init db
+ * 初始化数据库，建立ORM
+ * author pc ref. Liao 2017/9/22
  */
 'use strict'
 
 const 
+    fs = require('fs'),
     _ = require('lodash'),
     util = require('util'),
     logger = require('./logger'),
     config = require('./config'),
+    utils = require('./utils'),
     dbtypes = require('./dbtypes'),
     Sequelize = require('sequelize'),
     uuid = require('uuid/v4');
@@ -37,17 +40,18 @@ function nextId() {
     let id = util.format('%d%s000', Date.now(), uuid().replace(/\-/g, ''));
     return paddings[ID_LENGTH - id.length] + id;
 }
-    
+
     
 const sequelize = new Sequelize(
     config.db.database,
     config.db.username,
     config.db.password,
     {
-        dialect: 'sqlite',
-        storage: config.db.storage,
+        dialect: 'mysql',
+        host: config.db.host,
+        // storage: config.db.storage,
         dialectOptions: {
-            charset: 'utf8mb4'
+            charset: 'utf8'
         },
         pool: {
             maxConnections: config.db.maxConnections,
@@ -62,6 +66,15 @@ const sequelize = new Sequelize(
     }
 );
 
+/**
+ * 封装sequelize的ORM模型定义。
+ * 
+ * @param {any} modelName 模型名称
+ * @param {any} tableName 数据库表名称
+ * @param {any} attributes 模型属性
+ * @param {any} extraFields 扩展字段
+ * @returns sequelize定义的模型，可用此模型进行ORM操作
+ */
 function defineModel(modelName, tableName, attributes, extraFields) {
     let attrs = {
         id: {
@@ -73,67 +86,17 @@ function defineModel(modelName, tableName, attributes, extraFields) {
     for (let key in attributes) {
         if (attributes.hasOwnProperty(key)) {
             let opt = attributes[key];
+            // opt.allowNull = opt.allowNull === undefined ? true : opt.allowNull && true;
             opt.allowNull = opt.allowNull || false; //the allowNull of field default false
             attrs[key] = opt;
         }
     }
 
-    // add some other attribute
-    attrs.create_time = {
-        type: dbtypes.INTEGER,  //the second from 1970-01-01 00:00:00 UTC to now
-        allowNull: false
-    };
-
-    attrs.update_time = {
-        type: dbtypes.INTEGER, //the second from 1970-01-01 00:00:00 UTC to now
-        allowNull: false
-    };
-
-    logger.info(`model ${modelName} defined for table: ${tableName}.`);
-    // logger.debug(`model defined for table: ` + tableName + '\n' + JSON.stringify(attrs, function (k, v) {
-    //     if (k === 'type') {  // the type is the Sequelize type.
-    //         for (let key in Sequelize) {
-    //             if (key === 'ABSTRACT' || key === 'NUMBER') {
-    //                 continue;
-    //             }
-    //             let dbType = Sequelize[key];
-    //             if (typeof dbType === 'function') {
-    //                 if (v instanceof dbType) {
-    //                     if (v._length) {
-    //                         return `${dbType.key}(${v._length})`;
-    //                     }
-    //                     return dbType.key;
-    //                 }
-    //                 if (v === dbType) {
-    //                     return dbType.key;
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     return v;
-    // }, '  '));
-
     let options = {
         tableName: tableName,
-        charset: 'utf8mb4',
-        timestamps: false,
-        hooks: {
-            beforeValidate: function (obj) {
-                let now = Date.now();
-                if (obj.isNewRecord) {
-                    logger.info('will create entity: ' + obj);
-                    if(!obj.id) {
-                        obj.id = nextId();
-                    }
-                    obj.create_time = now;
-                    obj.update_time = now;
-                }
-            },
-            beforeUpdate: function (obj) {
-                logger.info('will update entity: ' + obj.id);
-                obj.update_time = now;
-            }
-        }
+        charset: 'utf8',
+        timestamps: false
+        
     };
     if (Array.isArray(extraFields)) {  //the extraFields must be a array
         let getters = {},
@@ -155,8 +118,8 @@ function defineModel(modelName, tableName, attributes, extraFields) {
 }
 
 let
-    files = require('fs').readdirSync(__dirname + '/models'),
-    re = new RegExp('^[A-Za-z][A-Za-z0-9\\_]*\\.js$');  //match the .js file(model file)
+    files = utils.getAllFiles(__dirname + '/models'),
+    re = new RegExp('^[A-Za-z][A-Za-z0-9/\\_]*\\.js$');  //match the .js file(model file)
 
 let exp = {
     ID_LENGTH: ID_LENGTH,
@@ -177,6 +140,7 @@ let exp = {
         }
     }
 }
+
 
 //add each model to exports
 files.filter((f) => {

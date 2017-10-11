@@ -2,7 +2,8 @@
 
 const 
     Sequelize = require('sequelize'),
-    TYPES = ['NULL', 'INTEGER', 'REAL', 'TEXT', 'BLOB'];
+    TYPES = ['NULL', 'STRING', 'CHAR', 'DECIMAL', 'BIGINT', 'INTEGER', 'FLOAT',
+     'DOUBLE', 'UUID', 'DATE', 'DATEONLY', 'BOOLEAN', 'TEXT'];
 
 // use uuid for id
 let exp = {
